@@ -11,8 +11,8 @@ from torch.utils.data import Subset
 
 class Test:
     def __init__(self):
-        self.path_to_model = "./model/inference.onnx"
-        self.path_to_trained = "./model/mnist_trained.onnx"
+        self.path_to_model = "./onnx/inference.onnx"
+        self.path_to_trained = "./onnx/mnist_trained.onnx"
    
     def load_test_images(self):
         batch_size = 64
