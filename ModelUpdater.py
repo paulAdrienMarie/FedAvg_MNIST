@@ -8,9 +8,26 @@ HERE = os.path.dirname(__file__)
 UPDATED_MODEL_PATH = os.path.join(HERE, "model", "inference.onnx")
 
 class ModelUpdater:
-    def __init__(self, updated_model_path, learning_rate=0.01):
+    """
+    Stores and updates weights of the model
+    
+    Attributs:
+    updated_model_path -- Path to the file in which to save the updated model
+    fc1_weights -- List to store the udpated weights of the weights of the fc1 layer
+    fc1_bias -- List to store the udpated bias of the bias of the fc1 layer
+    fc2_weights -- List to store the udpated weights of the weights of the fc2 layer
+    fc2_bias -- List to store the udpated bias of the bias of the fc2 layer
+    """
+    
+    def __init__(self, updated_model_path):
+        """
+        Initializes a new instance of the ModelUpdater class
+        
+        Arguments:
+        updated_model_path -- Path to the file in which to save the updated model
+        """
+        
         self.updated_model_path = updated_model_path
-        self.learning_rate = learning_rate
         self.fc1_weights = []
         self.fc1_bias = []
         self.fc2_weights = []
