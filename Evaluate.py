@@ -7,7 +7,16 @@ from onnxruntime.training.api import CheckpointState, Module
 import json
 
 class Test:
+    """
+    Tests the updated model after FedAvg
+    
+    Attributs:
+    path_to_model -- Path to model to test
+    metrics -- Dictionnary to store the metrics over the communication rounds
+    """
+    
     def __init__(self):
+        """Initializes a new instance of the Test class"""
         self.path_to_model = "./onnx/inference.onnx"
         self.metrics = {
             "accuracies": [],
@@ -15,6 +24,7 @@ class Test:
         }
    
     def load_test_images(self):
+        """Loads test set of images from the MNIST dataset"""
         batch_size = 64
         train_kwargs = {'batch_size': batch_size}
         
@@ -28,16 +38,39 @@ class Test:
         test_loader = torch.utils.data.DataLoader(dataset, **train_kwargs)
         return test_loader
     
-    def load_inference_session(self,path):
-        return ort.InferenceSession(path)
+    def load_inference_session(self):
+        """Loads Inference Session"""
+        return ort.InferenceSession(self.path_to_model)
     
     def get_predicted_labels(self, logits):
+        """
+        Proceeds logits, returns predicted label
+        
+        Arguments:
+        logits -- Raw output of the model
+        """
+        
         return np.argmax(logits, axis=-1)  # Assuming logits is a 2D array (batch_size, num_classes)
 
     def compute_accuracy(self,y_pred,y_true):
+        """
+        Computes accuracy metric between two lists of labels
+        
+        Arguments:
+        y_pred -- Predictions of the updated model as a list
+        y_true -- True labels as a list
+        """
+        
         return accuracy_score(y_pred,y_true)
     
     def test_artifacts(self,test_loader):
+        """
+        Runs test using the training artifacts
+        
+        Arguments:
+        test_loader -- Test set of MNIST dataset
+        """
+        
         state = CheckpointState.load_checkpoint("./artifacts/checkpoint")
 
         module = Module(
@@ -47,7 +80,7 @@ class Test:
             device="cpu"
         )
     
-        module.eval()
+        module.eval() # set the module in evaluation mode
         losses = []
         import evaluate
         metric = evaluate.load('accuracy')
@@ -81,6 +114,13 @@ class Test:
             json.dump(self.metrics,f)
             
     def test_model(self, test_loader):
+        """
+        Runs test using the inference session and the updated model
+        
+        Arguments:
+        test_loader -- Test set of MNIST dataset
+        """
+        
         inference_session = self.load_inference_session(self.path_to_model)
         input_name = inference_session.get_inputs()[0].name
         output_name = inference_session.get_outputs()[0].name
