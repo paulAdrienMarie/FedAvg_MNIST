@@ -82,5 +82,5 @@ class Artifacts:
         self.gen_artifacts()
 
 if __name__=="__main__":
-    obj = Artifacts("./model/inference.onnx")
+    obj = Artifacts("./onnx/inference.onnx")
     obj()
