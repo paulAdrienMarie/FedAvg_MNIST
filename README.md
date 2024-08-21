@@ -1,4 +1,4 @@
-# SIMULATION OF FEDERATED LEARNING
+# Simulation of Federated Learning using ONNXRuntime
 
 This project simulates a federated learning scenario on one single computer. The model used here is the MNIST digit classifier.
 
@@ -24,15 +24,18 @@ When the Python server have received all the individual updated parameters, it a
 
 Run this loop as many time as needed to reach your target accuracy. 
 
-## INSTALL REQUIREMENTS   
+## Install Requirements  
 
 - Create a new virtual environnement : `python3 -m venv env` and activate it `source env/bin/activate`. Install the requirements for this project `pip install -r requirements.txt`.
 
-## RUN THE PROJECT
+## Run the project
 
-- To run the whole project, run `python watcher.py`
+To run the whole project you will need two terminals. One will launch the web application and the other will connect to it and launch the simulation.
 
-## DETAILS OF THE FILES 
+- Terminal 1 : `python watcher.py`
+- Terminal 2 : `python Federated.py --nb_users=100 --batch_size=600 --nb_roc=50`
+
+## Details of the files
 
 ### Prepare Dataset for Federated Learning scenario
 
