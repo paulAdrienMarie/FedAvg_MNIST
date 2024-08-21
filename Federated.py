@@ -1,6 +1,5 @@
 import argparse
 from FederatedPreparer import FederatedPreparer
-from Evaluate import Test
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
@@ -9,18 +8,41 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class Federated:
+    """
+    Prepare the Federated Learning and launch it in headless mode on Firefox
+    Server has to be launched previously
+    
+    Attributs:
+    nb_users -- Number of users for the Federated Learning
+    batch_size -- Size of the subset to attribute to one client 
+    communication_round -- Number of model updates
+    federated_preparer -- Instance of the FederatedPreparer class 
+    url -- URL of the web application
+    """
     
     def __init__(self,args):
-        self.num_users = args.nb_users
+        """
+        Initializes a new instance of the Federated class
+        
+        Arguments:
+        args -- arguments passed at the execution of the script
+        """
+        
+        self.nb_users = args.nb_users
         self.batch_size = args.batch_size
-        self.mode = args.mode
         self.communication_round = args.nb_roc
-        self.learning_rate = args.lr
-        self.federated_preparer = FederatedPreparer(self.num_users,self.batch_size)
+        self.federated_preparer = FederatedPreparer(self.nb_users,self.batch_size)
         self.url = 'http://localhost:8080'
         
         
     def launch_federated_headless(self,url):
+        """
+        Connects to the web web page and launches the simulation by clicking 
+        on the launch federated button
+        
+        Arguments:
+        url -- URL of the web application
+        """
         
         options = Options()
         options.add_argument('--headless')  # Run in headless mode for no UI
@@ -63,15 +85,11 @@ class Federated:
             # Clean up and close the browser
             driver.quit()
             
-    def evaluate_model(self):
-        
-        obj = Test()
-        obj()
         
     def __call__(self):
+        """Prepare and launch the Federated Learning"""
         self.federated_preparer()
         self.launch_federated_headless(self.url)
-        self.evaluate_model()
         
 if __name__ == "__main__":
     
@@ -81,9 +99,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--nb_users", type=int, help="Number of users")
     parser.add_argument("--batch_size", type=int, help="Size of user batch of images")
-    parser.add_argument("--mode", type=str, help="How to launch the simulation")
     parser.add_argument("--nb_roc", type=str, help="Number of round of communication")
-    parser.add_argument("--lr", type=str, help="Learning rate")
     
     args = parser.parse_args()
     
