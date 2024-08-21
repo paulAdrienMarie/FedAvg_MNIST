@@ -4,8 +4,8 @@ ort.env.wasm.wasmPaths = "/dist/";
 ort.env.wasm.numThreads = 1;
 
 let BATCHSIZE = 5;
-let NUMUSERS = 50;
-let NUMEPOCHS = 50;
+let NUMUSERS = null;
+let NUMEPOCHS = null;
 
 /**
  * Runs the federated learning scenario for a 100 users
@@ -49,7 +49,8 @@ async function runFederated(com_round) {
       // Send the data to the created Worker
       let data = {
         userId: userIndex + 1,
-        epoch: com_round
+        epoch: com_round,
+        nb_user: NUMUSERS
       };
       worker.postMessage(data);
 
@@ -87,7 +88,29 @@ async function runFederated(com_round) {
   
 }
 
-export async function run() {
+export async function run(nb_users, nb_roc) {
+
+  NUMUSERS = Number(nb_users);
+  NUMEPOCHS = Number(nb_roc);
+  fetch("/set_nb_users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      nb_users: nb_users,
+      nb_roc: nb_roc
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log("Error:", error);
+    });
+
+  
   for (let epoch=0; epoch<NUMEPOCHS; epoch++) {
     await runFederated(epoch);
   }

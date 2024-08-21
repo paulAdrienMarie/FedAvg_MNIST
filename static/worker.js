@@ -21,7 +21,7 @@ const ARTIFACTS_PATH = {
 };
 
 // Path to the base model
-let MODEL_PATH = "/model/inference.onnx";
+let MODEL_PATH = "/onnx/inference.onnx";
 
 // Worker code for message handling
 self.addEventListener("message", async (event) => {
@@ -29,7 +29,8 @@ self.addEventListener("message", async (event) => {
   console.log(data);
   let userId = data.userId;
   let epoch = data.epoch;
-  let index = getRandomNumber(1,100);
+  let nb_users = data.nb_users;
+  let index = getRandomNumber(1,nb_users);
   var user_file = await loadJson(`/script/dataset/user_${index}.json`);
   console.log(user_file);
 

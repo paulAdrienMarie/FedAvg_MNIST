@@ -19,15 +19,19 @@ class ModelUpdater:
     fc2_bias -- List to store the udpated bias of the bias of the fc2 layer
     """
     
-    def __init__(self, updated_model_path):
+    def __init__(self, updated_model_path, nb_users,nb_roc):
         """
         Initializes a new instance of the ModelUpdater class
         
         Arguments:
         updated_model_path -- Path to the file in which to save the updated model
+        nb_roc -- Number of round of communications
+        nb_users -- Number of users in the simulation
         """
         
         self.updated_model_path = updated_model_path
+        self.nb_roc = nb_roc
+        self.nb_users = nb_users
         self.fc1_weights = []
         self.fc1_bias = []
         self.fc2_weights = []
@@ -45,7 +49,7 @@ class ModelUpdater:
         self.fc2_weights.append(fc2_weight_array)
         self.fc2_bias.append(fc2_bias_array)
         
-        print(f"Received data from {len(self.fc1_weights)} clients out of 50 clients")
+        print(f"Received data from {len(self.fc1_weights)} clients out of {self.nb_users} clients")
 
     def average_parameters(self, parameters_list):
         """Average the parameters collected from all clients."""

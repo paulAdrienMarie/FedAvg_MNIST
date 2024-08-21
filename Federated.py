@@ -35,7 +35,7 @@ class Federated:
         self.url = 'http://localhost:8080'
         
         
-    def launch_federated_headless(self,url):
+    def launch_federated_headless(self, url):
         """
         Connects to the web web page and launches the simulation by clicking 
         on the launch federated button
@@ -43,44 +43,50 @@ class Federated:
         Arguments:
         url -- URL of the web application
         """
-        
+
         options = Options()
         options.add_argument('--headless')  # Run in headless mode for no UI
         service = Service('/usr/local/bin/geckodriver')  # Update this path to your WebDriver
         driver = webdriver.Firefox(service=service, options=options)
-        
+
         try:
             # Open the web application
             driver.get(url)
-            
+
             # Wait until the page is loaded and a specific element is present (modify the selector as needed)
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.TAG_NAME, 'body'))  # You can change this to a more specific element
             )
+
+            # Example of filling out input fields
+            user_field = driver.find_element(By.ID, 'nb_users')
+            user_field.clear()  # Clear any existing text
+            user_field.send_keys(str(self.nb_users))  # Enter number of users
             
-            # Check if the page contains expected content (modify this as needed)
-            page_title = driver.title
-            if page_title:
-                print(f"Success: Connected to the web app. Page title is '{page_title}'.")
-            else:
-                print("Error: Unable to retrieve the page title.")
-                
+            communication_round_field = driver.find_element(By.ID, 'nb_roc')
+            communication_round_field.clear()
+            communication_round_field.send_keys(str(self.communication_round))
+
+            # Optionally, hit enter after filling out each input (if needed)
+            # user_field.send_keys(Keys.RETURN)
+
+            # Click the launch button
             button = driver.find_element(By.ID, 'launch_federated')
-            
             if button:
                 print("Button found")
             
             button.click()
-            
-            WebDriverWait(driver, 60000000000).until(
-                EC.presence_of_element_located((By.ID, 'completion_element_id')) 
+
+            # Wait for the completion of training
+            WebDriverWait(driver, 600).until(
+                EC.presence_of_element_located((By.ID, 'completion_element_id'))  # Modify to the appropriate element ID
             )
-            
+
             print("Training Completed")
-        
+
         except Exception as e:
             print(f"Error: {e}")
-        
+
         finally:
             # Clean up and close the browser
             driver.quit()

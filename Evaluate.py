@@ -4,15 +4,15 @@ import numpy as np
 import onnxruntime as ort
 from sklearn.metrics import accuracy_score
 from onnxruntime.training.api import CheckpointState, Module
-import random
-from torch.utils.data import Subset
-
-
+import json
 
 class Test:
     def __init__(self):
         self.path_to_model = "./onnx/inference.onnx"
-        self.path_to_trained = "./onnx/mnist_trained.onnx"
+        self.metrics = {
+            "accuracies": [],
+            "losses": []
+        }
    
     def load_test_images(self):
         batch_size = 64
@@ -25,13 +25,7 @@ class Test:
 
         dataset = datasets.MNIST('./', train=False, download=True, transform=transform)
 
-        # Select a random subset of 600 indices
-        indices = list(range(len(dataset)))
-        random.seed(42)  # For reproducibility
-        subset_indices = random.sample(indices, 200)
-        subset = Subset(dataset, subset_indices)
-        
-        test_loader = torch.utils.data.DataLoader(subset, **train_kwargs)
+        test_loader = torch.utils.data.DataLoader(dataset, **train_kwargs)
         return test_loader
     
     def load_inference_session(self,path):
@@ -65,17 +59,34 @@ class Test:
             losses.append(test_loss)
 
         metrics = metric.compute()
-        print(f'Test Loss: {sum(losses)/len(losses):.4f}, Accuracy : {metrics["accuracy"]:.4f}')
+        mean_loss = sum(losses)/len(losses)
+        accuracy = metrics["accuracy"]
+        print(f'Test Loss: {mean_loss:.4f}, Accuracy : {accuracy:.4f}')
         
+        self.save_metrics(mean_loss,accuracy)
+        
+    def save_metrics(self, loss, accuracy):
+        """
+        Save the metrics in a json file
+        
+        Arguments:
+        loss -- Current loss of the model
+        accuracy -- Current accuracy of the model
+        """
+        
+        self.metrics["losses"].append(loss)
+        self.metrics["accuracies"].append(accuracy)
+        
+        with open("metrics.json","w") as f:
+            json.dump(self.metrics,f)
+            
     def test_model(self, test_loader):
         inference_session = self.load_inference_session(self.path_to_model)
-        mnist_trained_session = self.load_inference_session(self.path_to_trained)
         input_name = inference_session.get_inputs()[0].name
         output_name = inference_session.get_outputs()[0].name
         
         all_labels = []
         all_targets = []
-        all_labels_trained = []
     
         for data, target in test_loader:
             # Run the inference session on the updated model
@@ -84,14 +95,9 @@ class Test:
             labels = self.get_predicted_labels(logits[0])
             all_labels.extend(labels)
             all_targets.extend(target.numpy())
-            # Run the inference session on the previously trained model
-            logits = mnist_trained_session.run([output_name], {input_name: forward_inputs})
-            labels = self.get_predicted_labels(logits[0])
-            all_labels_trained.extend(labels)
 
         accuracy = self.compute_accuracy(all_labels, all_targets)
         print(f"Accuracy with updated model : {accuracy:.4f}")
-        print(f"Accuracy with trained model : {self.compute_accuracy(all_labels_trained,all_targets)}")
         
     def __call__(self):
         test_loader = self.load_test_images()

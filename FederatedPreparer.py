@@ -78,6 +78,17 @@ class FederatedPreparer:
         output_dir = "./static/dataset/"
         os.makedirs(output_dir, exist_ok=True)
 
+        # Clear the output directory if it is not empty
+        for filename in os.listdir(output_dir):
+            file_path = os.path.join(output_dir, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)  # Remove the file or link
+                elif os.path.isdir(file_path):
+                    os.rmdir(file_path)  # Remove the directory (only if empty)
+            except Exception as e:
+                print(f"Failed to delete {file_path}. Reason: {e}")
+
         for user_id in range(self.nb_users):
             start_index = user_id * self.batch_size
             end_index = start_index + self.batch_size
