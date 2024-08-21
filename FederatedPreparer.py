@@ -11,35 +11,54 @@ NUM_THREADS = 20
 
 class FederatedPreparer:
     """
-    Generates the string representation of a set of images using base64 encoding.
-    Aims to be used during a Federated Learning scenario in the web.
+    Prepare the Federated Learning scenario by doing the following :
+    
+        - Generate nb_users json files that contain a subset of the MNIST dataset as follows :
+            - List[Dict{label,base64}]
+        - Generate the training artifacts using the Artifacts class.
+    
+    Attributes:
+    nb_users -- Number of users for the Federated Learning
+    batch_size -- Size of the subset to attribute to one client 
     """
     
     def __init__(self, nb_users, batch_size):
-        """Initializes a new Base64Generator instance."""
+        """
+        Initializes a new FederatedPreparer instance.
+        
+        Arguments:
+        nb_users -- Number of users for the Federated Learning
+        batch_size -- Size of the subset to attribute to one client
+        """
+        
         self.nb_users = nb_users
         self.batch_size = batch_size
 
     def generate(self):
-        """Creates a dictionary {id: string} using the COCO dataset."""
+        """
+        Convert images of the training set of the MNIST dataset in 
+        string using base64 encoding.
+        """
+        
         DATASET = "ylecun/mnist"
         ds = load_dataset(DATASET)
         images = ds["train"]["image"]
         labels = ds["train"]["label"]
         dataset = []
         
-        for i, img in enumerate(images):
+        for img in images:
             dataset.append(self.image_message(img)["url"])
         
-        print(len(dataset))
         return dataset, labels
 
     def image_message(self, image):
         """
         Generates the string representation of the given image using base64 encoding.
         
+        Arguments:
         image -- The image to process.
         """
+        
         buffered = BytesIO()
         image.save(buffered, format="PNG")
         img_byte = buffered.getvalue()
@@ -47,38 +66,32 @@ class FederatedPreparer:
         encoded_image = f"data:image/png;base64,{img_base64}"
         return {"url": encoded_image}
     
-    def prepare_jsons_for_federated_learning(self):
-
-        with open("./static/train_labels.json") as f:
-            train_data = json.loads(f.read())
-            
-        with open("./static/train_base64images.json") as f:
-            train_base64_data = json.loads(f.read())
-            
-        assert len(train_data) == len(train_base64_data), f"Inconsistent sizes: train_data has {len(train_data)} items, train_base64_data has {len(train_base64_data)} items."
-
-        NUMUSERS = self.nb_users
-        BATCHSIZE = self.batch_size
-
+    def prepare_jsons_for_federated_learning(self, images, labels):
+        """
+        Prepare the JSON files for federated learning directly from images and labels.
+        
+        Arguments:
+        images -- List of base64 encoded images
+        labels -- List of corresponding labels
+        """
+        
         output_dir = "./static/dataset/"
         os.makedirs(output_dir, exist_ok=True)
 
-        for user_id in range(NUMUSERS):
-            start_index = user_id * BATCHSIZE
-            end_index = start_index + BATCHSIZE
+        for user_id in range(self.nb_users):
+            start_index = user_id * self.batch_size
+            end_index = start_index + self.batch_size
             
-            if start_index >= len(train_data):
+            if start_index >= len(labels):
                 break
             
             print(f"Creating JSON file for user {user_id + 1}")
             
-            pictures_labels = train_data[start_index:end_index]
-            pictures_base64 = train_base64_data[start_index:end_index]
+            pictures_labels = labels[start_index:end_index]
+            pictures_base64 = images[start_index:end_index]
             
             ds = []
             for i, label in enumerate(pictures_labels):
-                if pictures_base64[i] is None:
-                    print(f"Warning: Missing base64 data for image ID {id}")
                 ds.append({
                     "label": label,
                     "base64": pictures_base64[i]
@@ -91,25 +104,25 @@ class FederatedPreparer:
                 json.dump(ds, f)
 
     def prepare_training_artifacts(self):
+        """
+        Prepare the training artifacts.
+        """
         
         obj = Artifacts("./onnx/inference.onnx")
         obj()
         
     
     def __call__(self):
-        """Runs the generate function and saves the resulting dict in a JSON file."""
+        """
+        Launch json files and training artifacts generation.  
+        """
         
         images, labels = self.generate()
-        print(len(images))
-        with open("./static/train_base64images.json", "w") as f:
-            json.dump(images, f)
+        print(f"Total images processed: {len(images)}")
             
-        with open("./static/train_labels.json","w") as f:
-            json.dump(labels, f)
-            
-        self.prepare_jsons_for_federated_learning()
+        self.prepare_jsons_for_federated_learning(images, labels)
         self.prepare_training_artifacts()
         
 if __name__ == "__main__":
-    preparer = FederatedPreparer()
+    preparer = FederatedPreparer(nb_users=100, batch_size=600)
     preparer()
