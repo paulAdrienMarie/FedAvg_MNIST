@@ -26,13 +26,11 @@ let MODEL_PATH = "/onnx/inference.onnx";
 // Worker code for message handling
 self.addEventListener("message", async (event) => {
   let data = event.data;
-  console.log(data);
   let userId = data.userId;
   let epoch = data.epoch;
   let nb_users = data.nb_users;
   let index = getRandomNumber(1,nb_users);
   var user_file = await loadJson(`/script/dataset/user_${index}.json`);
-  console.log(user_file);
 
   console.log(`CURRENTLY RUNNING USER ${userId} - EPOCH ${epoch}/50`);
   console.log(`LOADING TRAINING SESSION FOR USER ${userId}`);
@@ -57,7 +55,6 @@ self.addEventListener("message", async (event) => {
   }
   // Retrieve the updated weights from the training session
   let params = await trainingSession.getContiguousParameters(true);
-  console.log("PARAMS", params);
   console.log(`Making requests for user ${userId}`);
 
   // Send the updated weights to the backend server for storage
@@ -281,7 +278,6 @@ async function predict(base64) {
   const feeds = {
     "input": preprocessedImage
   };
-  console.log("Image", preprocessedImage)
   const results = await inferenceSession.run(feeds);
   const logits = results.output.cpuData;
 
@@ -317,20 +313,8 @@ async function train(base64, true_label) {
     await runTrainingEpoch(preprocessedImage, epoch, true_label);
   }
 
-  let params = await trainingSession.getContiguousParameters(true);
-  console.log("Parameters", params);
-
-  // let parameters = await paramsToUint8Buffer(params.cpuData);
-
-  // try {
-  //   await trainingSession.loadParametersBuffer(parameters, true);
-  //   console.log("Training Session parameters updated");
-  // } catch (err) {
-  //   console.log("Error:", err);
-  // }
-
   const trainingTime = Date.now() - startTrainingTime;
-  console.log(`Training completed in ${trainingTime}`);
+  console.log(`Training completed in ${trainingTime} milliseconds`);
 }
 
 
@@ -357,7 +341,6 @@ async function runTrainingEpoch(image, epoch, y_true) {
     "input": image,
     "labels": tensor,
   };
-  console.log(feeds.labels);
   const results = await trainingSession.runTrainStep(feeds);
   const loss = results[lossNodeName].data;
 
