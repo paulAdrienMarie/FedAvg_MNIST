@@ -92,7 +92,7 @@ class FederatedPreparer:
 
     def prepare_training_artifacts(self):
         
-        obj = Artifacts("./model/inference.onnx")
+        obj = Artifacts("./onnx/inference.onnx")
         obj()
         
     
