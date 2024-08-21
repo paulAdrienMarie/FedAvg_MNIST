@@ -7,9 +7,9 @@ from Evaluate import Test
 # Initialize ModelUpdater with the path to the ONNX model
 here = os.path.dirname(__file__)
 
-updated_model_path = os.path.join(here, "model/inference.onnx")
+updated_model_path = os.path.join(here, "onnx/inference.onnx")
 model_updater = ModelUpdater(updated_model_path=updated_model_path)
-artifacts = Artifacts("./model/inference.onnx")
+artifacts = Artifacts("./onnx/inference.onnx")
 test = Test()
 
 async def update_model(request):
