@@ -5,27 +5,10 @@ from Artifacts import Artifacts
 import json
 from onnxruntime.training.api import CheckpointState, Module, Optimizer
 import numpy as np
-import random
-from torch.utils.data import Subset
 from torchvision import datasets, transforms
 from sklearn.metrics import accuracy_score
 
 assert list(platform.python_version_tuple())[:-1] == ["3", "9"]
-
-# Pytorch class that we will use to generate the graphs.
-class MNISTNet(torch.nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
-        super(MNISTNet, self).__init__()
-
-        self.fc1 = torch.nn.Linear(input_size, hidden_size)
-        self.relu = torch.nn.ReLU()
-        self.fc2 = torch.nn.Linear(hidden_size, num_classes)
-
-    def forward(self, model_input):
-        out = self.fc1(model_input)
-        out = self.relu(out)
-        out = self.fc2(out)
-        return out
 
 class Train:
     def __init__(self, path_to_training, path_to_eval, path_to_optimizer, path_to_checkpoint, path_to_model):
@@ -53,7 +36,7 @@ class Train:
         
     def load_model(self):
         print("Loading the model")
-        self.model = onnx.load_model("./model/base_model.onnx")
+        self.model = onnx.load_model("./onnx/inference.onnx")
         
     def loadJson(self, path):
         with open(path) as f:
@@ -106,7 +89,7 @@ class Train:
         print(f'Epoch: {epoch+1} - Train Loss: {sum(losses)/len(losses):.4f}')
         
         CheckpointState.save_checkpoint(state, self.path_to_checkpoint)
-        module.export_model_for_inferencing("./model/mnist_trained.onnx", ["output"])
+        module.export_model_for_inferencing("./onnx/mnist_trained.onnx", ["output"])
         
     def __call__(self,epoch):
         train_loader = self.load_train_images()
@@ -170,7 +153,7 @@ class Test:
         
 if __name__ == "__main__":
     print("Exporting the model")
-    path_to_model = "./model/mnist_trained.onnx"
+    path_to_model = "./onnx/mnist_trained.onnx"
     art = Artifacts(path_to_model=path_to_model)
     art()
     # Training loop
