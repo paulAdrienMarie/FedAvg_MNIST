@@ -1,11 +1,13 @@
 import argparse
 from FederatedPreparer import FederatedPreparer
+import time
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import traceback
 
 class Federated:
     """
@@ -49,43 +51,70 @@ class Federated:
         service = Service('/usr/local/bin/geckodriver')  # Update this path to your WebDriver
         driver = webdriver.Firefox(service=service, options=options)
 
+
         try:
             # Open the web application
             driver.get(url)
+            print("Page loaded successfully")
 
-            # Wait until the page is loaded and a specific element is present (modify the selector as needed)
+            # Wait until the page is loaded and a specific element is present
             WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, 'body'))  # You can change this to a more specific element
+                EC.presence_of_element_located((By.TAG_NAME, 'body'))
             )
+            print("Body tag found")
 
-            # Example of filling out input fields
+            # Log current page source (for debugging purposes)
+            with open("page_source.html", "w") as f:
+                f.write(driver.page_source)
+
+            # Fill out input fields
+            print("Attempting to find the 'nb_users' field")
             user_field = driver.find_element(By.ID, 'nb_users')
-            user_field.clear()  # Clear any existing text
-            user_field.send_keys(str(self.nb_users))  # Enter number of users
-            
+            user_field.clear()
+            user_field.send_keys(str(self.nb_users))
+            print(f"'nb_users' field found and set to {self.nb_users}")
+
+            print("Attempting to find the 'nb_roc' field")
             communication_round_field = driver.find_element(By.ID, 'nb_roc')
             communication_round_field.clear()
             communication_round_field.send_keys(str(self.communication_round))
-
-            # Optionally, hit enter after filling out each input (if needed)
-            # user_field.send_keys(Keys.RETURN)
+            print(f"'nb_roc' field found and set to {self.communication_round}")
 
             # Click the launch button
+            print("Attempting to find the 'launch_federated' button")
             button = driver.find_element(By.ID, 'launch_federated')
-            if button:
-                print("Button found")
-            
+            print("Button found")
             button.click()
+            print("Launch button clicked")
 
-            # Wait for the completion of training
-            WebDriverWait(driver, 600).until(
-                EC.presence_of_element_located((By.ID, 'completion_element_id'))  # Modify to the appropriate element ID
-            )
+            # Polling to check for the completion element
+            max_wait_time = 8 * 60 * 60  # 8 hours in seconds
+            polling_interval = 5 * 60  # Check every 5 minutes
+            elapsed_time = 0
 
-            print("Training Completed")
+            while elapsed_time < max_wait_time:
+                try:
+                    print("Checking for 'completion_element_id'")
+                    if driver.find_element(By.ID, 'completion_element_id'):
+                        print("Training Completed")
+                        break
+                except Exception as e:
+                    print(f"Element not found, retrying... ({elapsed_time}s elapsed)")
+
+                # Sleep for the polling interval and update elapsed time
+                time.sleep(polling_interval)
+                elapsed_time += polling_interval
+
+            if elapsed_time >= max_wait_time:
+                print("Timeout: Training did not complete within the expected time")
 
         except Exception as e:
             print(f"Error: {e}")
+            print(traceback.format_exc())  # Print the full stack trace for debugging
+            # Optional: Save the current page state to a file for analysis
+            with open("error_page_source.html", "w") as f:
+                f.write(driver.page_source)
+            driver.save_screenshot("error_screenshot.png")  # Save screenshot for analysis
 
         finally:
             # Clean up and close the browser

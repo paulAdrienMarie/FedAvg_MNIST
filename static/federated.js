@@ -50,7 +50,7 @@ async function runFederated(com_round) {
       let data = {
         userId: userIndex + 1,
         epoch: com_round,
-        nb_user: NUMUSERS
+        nb_users: nb_user
       };
       worker.postMessage(data);
 
