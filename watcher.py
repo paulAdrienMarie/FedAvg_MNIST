@@ -1,3 +1,6 @@
+# I am not sure about the role of this module in the project,
+# it seemed optional, but I think you have to use to use the app/
+# explain here
 import sys
 import subprocess
 import time

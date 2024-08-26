@@ -1,4 +1,7 @@
-html, body {
+/* why not in static/ */
+
+html,
+body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
@@ -43,14 +46,15 @@ html, body {
 .check_button {
   appearance: none;
   background-color: #2ea44f;
-  border: 1px solid rgba(27, 31, 35, .15);
+  border: 1px solid rgba(27, 31, 35, 0.15);
   border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-shadow: rgba(27, 31, 35, 0.1) 0 1px 0;
   box-sizing: border-box;
   color: #fff;
   cursor: pointer;
   display: inline-block;
-  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-size: 14px;
   font-weight: 600;
   line-height: 20px;
@@ -75,19 +79,19 @@ html, body {
 }
 
 .check_button:focus {
-  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+  box-shadow: rgba(46, 164, 79, 0.4) 0 0 0 3px;
   outline: none;
 }
 
 .check_button:disabled {
   background-color: #94d3a2;
-  border-color: rgba(27, 31, 35, .1);
-  color: rgba(255, 255, 255, .8);
+  border-color: rgba(27, 31, 35, 0.1);
+  color: rgba(255, 255, 255, 0.8);
   cursor: default;
 }
 
 .check_button:active {
-  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+  box-shadow: rgba(20, 70, 32, 0.2) 0 1px 0 inset;
 }
 
 #button-retrain-id {
