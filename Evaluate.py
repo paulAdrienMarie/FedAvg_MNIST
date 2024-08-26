@@ -5,6 +5,7 @@ import onnxruntime as ort
 from sklearn.metrics import accuracy_score
 from onnxruntime.training.api import CheckpointState, Module
 import json
+import evaluate
 
 class Test:
     """
@@ -82,7 +83,6 @@ class Test:
     
         module.eval() # set the module in evaluation mode
         losses = []
-        import evaluate
         metric = evaluate.load('accuracy')
 
         for _, (data, target) in enumerate(test_loader):
