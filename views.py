@@ -8,15 +8,11 @@ from Evaluate import Test
 model_path = os.path.join(os.path.dirname(__file__), "onnx/inference.onnx")
 artifacts_path = os.path.join(os.path.dirname(__file__),"artifacts")
 
-# Initialize numerical constant
-nb_classes = 200
-
 # Initialize Test and Artifacts instances
 test = Test()
 artifacts = Artifacts(
             artifacts_path=artifacts_path,
             model_path=model_path,
-            nb_classes=nb_classes
         )
 
 # Global variable to store the number of users

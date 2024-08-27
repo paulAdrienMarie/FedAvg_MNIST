@@ -53,7 +53,7 @@ class ModelUpdater:
             self.parameters[param].append(np.array(updated_weights[index:index + num_elements], dtype=np.float32).reshape(shape))
             index += num_elements
         
-        print(f"Received data from {len(self.parameters['classifier.weight'])} clients out of {self.nb_users} clients")
+        print(f"Received data from {len(self.parameters['fc1.weight'])} clients out of {self.nb_users} clients")
         
     def get_parameters_shape(self, name):
         for initializer in self.model.graph.initializer:

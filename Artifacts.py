@@ -23,14 +23,16 @@ class MNISTNET(torch.nn.Module):
 
 class Artifacts: 
     
-    def __init__(self, path_to_model):
-        self.path_to_model = path_to_model
+    def __init__(self, model_path, artifacts_path):
+        self.model_path = model_path
+        self.artifacts_path = artifacts_path
+        self.model = None
           
     def export_model(self):
 
         device = "cpu"
         batch_size, input_size, hidden_size, output_size = 64, 784, 500, 10
-        pt_model = MNISTNET(input_size, hidden_size, output_size).to(device)
+        self.model = MNISTNET(input_size, hidden_size, output_size).to(device)
         
         model_inputs = (torch.randn(batch_size,input_size,device=device),)
         
@@ -40,7 +42,7 @@ class Artifacts:
         
         f = io.BytesIO()
         torch.onnx.export(
-            pt_model,
+            self.model,
             model_inputs,
             f,
             input_names=input_names,
@@ -56,11 +58,11 @@ class Artifacts:
         
         onnx_model = onnx.load_model_from_string(f.getvalue())
         
-        onnx.save_model(onnx_model,self.path_to_model)
+        onnx.save_model(onnx_model,self.model_path)
         
     def gen_artifacts(self):
         
-        onnx_model = onnx.load_model(self.path_to_model)
+        onnx_model = onnx.load_model(self.model_path)
         
         requires_grad = [param.name for param in onnx_model.graph.initializer]
         frozen_params = [param.name for param in onnx_model.graph.initializer if param.name not in requires_grad]

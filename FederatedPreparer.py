@@ -118,7 +118,10 @@ class FederatedPreparer:
         Prepare the training artifacts.
         """
         
-        obj = Artifacts("./onnx/inference.onnx")
+        obj = Artifacts(
+            model_path="./onnx/inference.onnx",
+            artifacts_path="./artifacts"
+        )
         obj()
         
     
