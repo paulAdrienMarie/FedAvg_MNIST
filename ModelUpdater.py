@@ -18,7 +18,12 @@ class ModelUpdater:
     classifier_bias -- List to store the updated bias of the classification head
     """
     
-    def __init__(self, model_path, nb_users, nb_roc):
+    def __init__(
+        self,
+        model_path,
+        nb_users,
+        nb_roc
+    ):
         """
         Initializes a new instance of the ModelUpdater class
         
@@ -102,9 +107,12 @@ class ModelUpdater:
     def reset(self):
         """Clear all accumulated weights and biases."""
         self.parameters = {
-            "classifier.weight": [],
-            "classifier.bias": []
+            "fc1.weight": [],
+            "fc1.bias": [],
+            "fc2.weight": [],
+            "fc2.bias": []
         }
         print("Reset all weight and bias lists.")
+
         
 

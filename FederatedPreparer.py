@@ -6,7 +6,6 @@ from Artifacts import Artifacts
 from datasets import load_dataset
 
 # Constants
-IMAGES_DIR = "./dest/"
 NUM_THREADS = 20
 
 class FederatedPreparer:
