@@ -9,11 +9,13 @@ import evaluate
 
 class Test:
     """
+    
     Tests the updated model after FedAvg
     
     Attributs:
     path_to_model -- Path to model to test
     metrics -- Dictionnary to store the metrics over the communication rounds
+    
     """
     
     def __init__(self):
@@ -45,31 +47,37 @@ class Test:
     
     def get_predicted_labels(self, logits):
         """
+        
         Proceeds logits, returns predicted label
         
         Arguments:
         logits -- Raw output of the model
+        
         """
         
         return np.argmax(logits, axis=-1)  # Assuming logits is a 2D array (batch_size, num_classes)
 
     def compute_accuracy(self,y_pred,y_true):
         """
+        
         Computes accuracy metric between two lists of labels
         
         Arguments:
         y_pred -- Predictions of the updated model as a list
         y_true -- True labels as a list
+        
         """
         
         return accuracy_score(y_pred,y_true)
     
     def test_artifacts(self,test_loader):
         """
+        
         Runs test using the training artifacts
         
         Arguments:
         test_loader -- Test set of MNIST dataset
+        
         """
         
         state = CheckpointState.load_checkpoint("./artifacts/checkpoint")
@@ -100,11 +108,13 @@ class Test:
         
     def save_metrics(self, loss, accuracy):
         """
+        
         Save the metrics in a json file
         
         Arguments:
         loss -- Current loss of the model
         accuracy -- Current accuracy of the model
+        
         """
         
         self.metrics["losses"].append(loss)
@@ -115,10 +125,12 @@ class Test:
             
     def test_model(self, test_loader):
         """
+        
         Runs test using the inference session and the updated model
         
         Arguments:
         test_loader -- Test set of MNIST dataset
+        
         """
         
         inference_session = self.load_inference_session(self.path_to_model)

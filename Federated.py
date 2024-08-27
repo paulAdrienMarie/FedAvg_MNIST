@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class Federated:
     """
+    
     Prepare the Federated Learning and launch it in headless mode on Firefox
     Server has to be launched previously
     
@@ -18,14 +19,17 @@ class Federated:
     communication_round -- Number of model updates
     federated_preparer -- Instance of the FederatedPreparer class 
     url -- URL of the web application
+    
     """
     
     def __init__(self,args):
         """
+        
         Initializes a new instance of the Federated class
         
         Arguments:
         args -- arguments passed at the execution of the script
+        
         """
         
         self.nb_users = args.nb_users
@@ -37,11 +41,13 @@ class Federated:
         
     def launch_federated_headless(self, url):
         """
+        
         Connects to the web web page and launches the simulation by clicking 
         on the launch federated button
         
         Arguments:
         url -- URL of the web application
+        
         """
 
         options = Options()

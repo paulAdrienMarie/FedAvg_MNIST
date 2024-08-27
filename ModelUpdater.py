@@ -8,6 +8,7 @@ model_path = os.path.join(os.path.dirname(__file__), "model", "inference.onnx")
 
 class ModelUpdater:
     """
+    
     Stores and updates weights of the model
     
     Attributes:
@@ -16,6 +17,7 @@ class ModelUpdater:
     nb_users -- Number of users during the FL simulation
     classifier_weights -- List to store the updated weights of the classification head
     classifier_bias -- List to store the updated bias of the classification head
+    
     """
     
     def __init__(
@@ -25,12 +27,14 @@ class ModelUpdater:
         nb_roc
     ):
         """
+        
         Initializes a new instance of the ModelUpdater class
         
         Arguments:
         model_path -- Path to the file in which to save the updated model
         nb_roc -- Number of rounds of communications
         nb_users -- Number of users in the simulation
+        
         """
         
         self.model_path = model_path
@@ -58,7 +62,6 @@ class ModelUpdater:
     def get_parameters_shape(self, name):
         for initializer in self.model.graph.initializer:
             if initializer.name == name:
-                # The shape of the initializer (i.e., the parameter)
                 shape = initializer.dims
                 return tuple(shape)  # Return the shape as a tuple
         # If the parameter with the given name is not found, return None or raise an exception

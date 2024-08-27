@@ -10,6 +10,7 @@ NUM_THREADS = 20
 
 class FederatedPreparer:
     """
+    
     Prepare the Federated Learning scenario by doing the following :
     
         - Generate nb_users json files that contain a subset of the MNIST dataset as follows :
@@ -19,15 +20,18 @@ class FederatedPreparer:
     Attributes:
     nb_users -- Number of users for the Federated Learning
     batch_size -- Size of the subset to attribute to one client 
+    
     """
     
     def __init__(self, nb_users, batch_size):
         """
+        
         Initializes a new FederatedPreparer instance.
         
         Arguments:
         nb_users -- Number of users for the Federated Learning
         batch_size -- Size of the subset to attribute to one client
+        
         """
         
         self.nb_users = nb_users
@@ -35,8 +39,10 @@ class FederatedPreparer:
 
     def generate(self):
         """
+        
         Convert images of the training set of the MNIST dataset in 
         string using base64 encoding.
+        
         """
         
         DATASET = "ylecun/mnist"
@@ -52,10 +58,12 @@ class FederatedPreparer:
 
     def image_message(self, image):
         """
+        
         Generates the string representation of the given image using base64 encoding.
         
         Arguments:
         image -- The image to process.
+        
         """
         
         buffered = BytesIO()
@@ -67,11 +75,13 @@ class FederatedPreparer:
     
     def prepare_jsons_for_federated_learning(self, images, labels):
         """
+        
         Prepare the JSON files for federated learning directly from images and labels.
         
         Arguments:
         images -- List of base64 encoded images
         labels -- List of corresponding labels
+        
         """
         
         output_dir = "./static/dataset/"
@@ -115,7 +125,9 @@ class FederatedPreparer:
 
     def prepare_training_artifacts(self):
         """
+        
         Prepare the training artifacts.
+        
         """
         
         obj = Artifacts(
@@ -126,9 +138,7 @@ class FederatedPreparer:
         
     
     def __call__(self):
-        """
-        Launch json files and training artifacts generation.  
-        """
+        """Prepare json files and launch training artifacts generation."""
         
         images, labels = self.generate()
         print(f"Total images processed: {len(images)}")
