@@ -15,8 +15,7 @@ class ModelUpdater:
     model_path -- Path to the file in which to save the updated model
     nb_roc -- Number of client-server communications 
     nb_users -- Number of users during the FL simulation
-    classifier_weights -- List to store the updated weights of the classification head
-    classifier_bias -- List to store the updated bias of the classification head
+    parameters -- Dictionnary containing the updated parameters
     
     """
     
@@ -24,7 +23,8 @@ class ModelUpdater:
         self,
         model_path,
         nb_users,
-        nb_roc
+        nb_roc,
+        avg_method
     ):
         """
         
@@ -47,6 +47,7 @@ class ModelUpdater:
             "fc2.bias": []
         }
         self.model = onnx.load(self.model_path)
+        self.averaging_method = avg_method
     
     def update_weights(self, updated_weights):
         """Store the weights from a client for averaging later."""
@@ -73,6 +74,14 @@ class ModelUpdater:
             return None
         print("Averaging models parameters")
         return np.mean(parameters_list, axis=0).astype(np.float32)
+    
+    def median_parameters(self, parameters_list):
+        """Apply the median to update parameters collected from all clients."""
+        if len(parameters_list) == 0:
+            return None
+        print("Updating parameters using median")
+        return np.median(parameters_list, axis=0).astype(np.float32)
+
 
     def copy_to_model(self, model, name, params):
         """Copy the averaged parameters to the ONNX model."""
@@ -84,7 +93,7 @@ class ModelUpdater:
 
     def update_model(self):
         """Update the ONNX model with the averaged parameters."""
-        if not self.parameters["classifier.weight"] or not self.parameters["classifier.bias"]:
+        if not self.parameters["fc1.weight"] or not self.parameters["fc1.bias"]:
             print("No user data to process")
             return {"message": "No user data to process"}
         
@@ -93,12 +102,20 @@ class ModelUpdater:
         
         # Average the parameters
         print("Start averaging the parameters")
-        for param_name in self.parameters:
-            self.copy_to_model(
-                self.model,
-                param_name, 
-                self.average_parameters(self.parameters[param_name])
-            )
+        if self.averaging_method == "mean":
+            for param_name in self.parameters:
+                self.copy_to_model(
+                    self.model,
+                    param_name, 
+                    self.average_parameters(self.parameters[param_name])
+                )
+        elif self.averaging_method == "median":
+            for param_name in self.parameters:
+                self.copy_to_model(
+                    self.model,
+                    param_name, 
+                    self.median_parameters(self.parameters[param_name])
+                )
         
         print("Saving the model")
         onnx.save_model(self.model, self.model_path)

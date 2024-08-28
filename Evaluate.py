@@ -104,7 +104,7 @@ class Test:
         accuracy = metrics["accuracy"]
         print(f'Test Loss: {mean_loss:.4f}, Accuracy : {accuracy:.4f}')
         
-        self.save_metrics(mean_loss,accuracy)
+        self.save_metrics(mean_loss.item(),accuracy)
         
     def save_metrics(self, loss, accuracy):
         """

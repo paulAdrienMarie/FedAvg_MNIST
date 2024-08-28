@@ -35,8 +35,9 @@ class Federated:
         self.nb_users = args.nb_users
         self.batch_size = args.batch_size
         self.communication_round = args.nb_roc
+        self.averaging_method = args.avg_method
         self.federated_preparer = FederatedPreparer(self.nb_users,self.batch_size)
-        self.url = 'http://localhost:8081'
+        self.url = 'http://localhost:8080'
         
         
     def launch_federated_headless(self, url):
@@ -72,6 +73,10 @@ class Federated:
             communication_round_field = driver.find_element(By.ID, "nb_roc")
             communication_round_field.clear()
             communication_round_field.send_keys(str(self.communication_round))
+            
+            averaging_method = driver.find_element(By.ID, "avg_method")
+            averaging_method.clear()
+            averaging_method.send_keys(str(self.averaging_method))
 
             # Optionally, hit enter after filling out each input (if needed)
             # user_field.send_keys(Keys.RETURN)
@@ -112,6 +117,8 @@ if __name__ == "__main__":
     parser.add_argument("--nb_users", type=int, help="Number of users")
     parser.add_argument("--batch_size", type=int, help="Size of user batch of images")
     parser.add_argument("--nb_roc", type=int, help="Number of round of communication")
+    parser.add_argument("--avg_method", type=str, help="Averaging method")
+
     
     args = parser.parse_args()
     

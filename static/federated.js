@@ -88,7 +88,7 @@ async function runFederated(com_round) {
   
 }
 
-export async function run(nb_users, nb_roc) {
+export async function run(nb_users, nb_roc, avg_method) {
 
   NUMUSERS = Number(nb_users);
   NUMEPOCHS = Number(nb_roc);
@@ -99,7 +99,8 @@ export async function run(nb_users, nb_roc) {
     },
     body: JSON.stringify({
       nb_users: nb_users,
-      nb_roc: nb_roc
+      nb_roc: nb_roc,
+      avg_method : avg_method
     }),
   })
     .then((response) => response.json())

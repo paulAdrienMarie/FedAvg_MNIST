@@ -31,11 +31,13 @@ async def set_num_user(request):
         data = await request.json()  # Await the JSON data
         nb_users = int(data.get("nb_users"))  # Set the global variable
         nb_roc = int(data.get("nb_roc"))
-        
+        avg_method = str(data.get("avg_method"))
+        print(avg_method)
         model_updater = ModelUpdater(
             model_path=model_path,
             nb_users=nb_users,
-            nb_roc=nb_roc
+            nb_roc=nb_roc,
+            avg_method=avg_method
         )
         
         return web.json_response({"message": f"Number of users set to {nb_users}"})
@@ -61,12 +63,12 @@ async def update_model(request):
         
         print(f'Received data of user {user_id} - Epoch {epoch+1}/{nb_roc}')
         model_updater.update_weights(updated_weights=list_values)
-        
+    
         # Ensure nb_users is set before using it
         if nb_users is None:
             return web.json_response({"error": "Number of users not set"}, status=400)
         
-        if len(list(model_updater.parameters.items())) % nb_users == 0:
+        if len(list(model_updater.parameters[next(iter(model_updater.parameters))])) % nb_users == 0:
             print("Updating the model parameters")
             response_data = model_updater.update_model()
             print("Generating the new training artifacts based on the new model")
